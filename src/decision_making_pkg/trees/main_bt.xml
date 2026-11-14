@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <!-- 위에 있는 가지일수록 우선순위가 높다:
+       장애물 정지 > 빨간불 정지 > 차선 주행 > (경로가 없으면) 정지 -->
+  <BehaviorTree ID="main">
+    <ReactiveFallback>
+      <ReactiveSequence>
+        <ObstacleDetected/>
+        <Stop/>
+      </ReactiveSequence>
+      <ReactiveSequence>
+        <RedLightAhead/>
+        <Stop/>
+      </ReactiveSequence>
+      <FollowLane/>
+      <Stop/>
+    </ReactiveFallback>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Condition ID="ObstacleDetected" editable="true"/>
+    <Condition ID="RedLightAhead" editable="true"/>
+    <Action ID="FollowLane" editable="true"/>
+    <Action ID="Stop" editable="true"/>
+    <Action ID="DriveForward2s" editable="true"/>
+  </TreeNodesModel>
+
+</root>

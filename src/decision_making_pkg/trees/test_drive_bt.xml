@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <!-- 테스트용: 2초 동안 직진한 뒤 멈추고 종료한다 -->
+  <BehaviorTree ID="main">
+    <Sequence>
+      <DriveForward2s/>
+    </Sequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="DriveForward2s" editable="true"/>
+  </TreeNodesModel>
+
+</root>
