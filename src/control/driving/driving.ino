@@ -4,10 +4,10 @@ const unsigned int MAX_INPUT = 15;
 // 핀 번호 변수
 const int STEERING_1 = 2;
 const int STEERING_2 = 3;
-const int FORWARD_RIGHT_1 = 4;
-const int FORWARD_RIGHT_2 = 5;
-const int FORWARD_LEFT_1 = 6;
-const int FORWARD_LEFT_2 =7;
+const int FORWARD_LEFT_1 = 4;
+const int FORWARD_LEFT_2 = 5;
+const int FORWARD_RIGHT_1 = 6;
+const int FORWARD_RIGHT_2 =7;
 const int POT = A2;
 
 // 조향 속도 상수
@@ -19,6 +19,13 @@ const int resistance_most_right = 352;
 
 // 조향 최대 단계 수 (한 쪽 기준)
 const int MAX_STEERING_STEP = 7;
+
+// [추가] 조향 사용 여부: 가변저항을 달고 위의 두 값을 실측값으로 바꾼 뒤 true 로 변경
+const bool STEERING_ENABLED = false;
+
+// [추가] 이 시간(ms) 동안 명령이 없으면 후륜 정지
+const unsigned long COMMAND_TIMEOUT = 500;
+unsigned long lastRxTime = 0; // 마지막으로 명령을 받은 시간
 
 // 제어 상태 변수
 int angle = 0, resistance = 0, mapped_resistance = 0;
@@ -61,17 +68,28 @@ void loop() {
 
     // 일정 시간 간격으로만 제어 명령 실행
     if (currentTime - lastCommandTime >= COMMAND_INTERVAL) {
-        // 포텐셔미터 값을 읽어 조향 계산
-        resistance = analogRead(POT);
-        mapped_resistance = map(resistance, resistance_most_left, resistance_most_right, -MAX_STEERING_STEP, MAX_STEERING_STEP + 1);
-
-        // 조향 상태에 따라 동작 제어
-        if (mapped_resistance == angle) {
+        if (!STEERING_ENABLED) {
+            // [추가] 조향을 꺼둔 동안은 조향 모터 정지
             maintainSteering();
-        } else if (mapped_resistance > angle) {
-            steerLeft();
         } else {
-            steerRight();
+            // 포텐셔미터 값을 읽어 조향 계산
+            resistance = analogRead(POT);
+            mapped_resistance = map(resistance, resistance_most_left, resistance_most_right, -MAX_STEERING_STEP, MAX_STEERING_STEP + 1);
+
+            // 조향 상태에 따라 동작 제어
+            if (mapped_resistance == angle) {
+                maintainSteering();
+            } else if (mapped_resistance > angle) {
+                steerLeft();
+            } else {
+                steerRight();
+            }
+        }
+
+        // [추가] 명령이 끊기면 후륜 정지
+        if (currentTime - lastRxTime > COMMAND_TIMEOUT) {
+            left_speed = 0;
+            right_speed = 0;
         }
 
         // 모터 속도 설정
@@ -155,6 +173,8 @@ void processData(const char *data) {
     }
 
     if (sIndex != -1 && lIndex != -1 && rIndex != -1) {
+        lastRxTime = millis(); // [추가] 명령 받은 시간 기록
+
         int newAngle = atoi(data + sIndex + 1);
         int newLeftSpeed = atoi(data + lIndex + 1);
         int newRightSpeed = atoi(data + rIndex + 1);
