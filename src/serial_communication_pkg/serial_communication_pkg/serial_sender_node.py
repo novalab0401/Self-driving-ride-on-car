@@ -13,8 +13,9 @@ from .lib import protocol_convert_func_lib as PCFL
 # Subscribe할 토픽 이름
 SUB_TOPIC_NAME = "topic_control_signal"
 
-# 아두이노 장치 이름 (ls /dev/ttyA* 명령을 터미널 창에 입력하여 확인)
-PORT='/dev/ttyACM0'
+# 아두이노 장치 이름 (ls /dev/ttyUSB* /dev/ttyACM* 명령을 터미널 창에 입력하여 확인)
+# CH340 칩을 쓰는 호환 보드는 ttyUSB, 정품 Uno 는 ttyACM 으로 잡힌다
+PORT='/dev/ttyUSB0'
 #----------------------------------------------
 
 ser = serial.Serial(PORT, 115200, timeout=1)
