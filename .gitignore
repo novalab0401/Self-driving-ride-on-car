@@ -1,0 +1,16 @@
+# Python 캐시
+__pycache__/
+*.pyc
+
+# colcon 빌드 산출물 (레포 안에서 빌드했을 때)
+build/
+install/
+log/
+
+# 수집한 데이터셋
+Collected_Datasets/
+
+# 모델 가중치
+*.pt
+*.onnx
+*.engine
